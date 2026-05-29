@@ -9,5 +9,6 @@
       "@/*": ["src/*"]
     }
   },
+  "exclude": ["__tests__/**/*", "e2e/**/*"],
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }
