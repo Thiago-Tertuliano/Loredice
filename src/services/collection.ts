@@ -3,7 +3,7 @@ import { jogosColecao } from '../db/schema/jogos';
 import { jogosCategorias } from '../db/schema/categorias';
 import { executeQuery } from '../lib/db';
 import { eq } from 'drizzle-orm';
-import { Result, success, failure } from '../utils/results';
+import { type Result, success, failure } from '../utils/results';
 import type { AppError } from '../errors/app-error';
 
 export type EstadoConservacao = 'novo' | 'como_novo' | 'desgastado' | 'faltando_pecas';

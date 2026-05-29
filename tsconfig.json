@@ -4,11 +4,12 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "ignoreDeprecations": "6.0",
+    "types": ["jest"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "exclude": ["__tests__/**/*", "e2e/**/*"],
+  "exclude": ["e2e/**/*"],
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
 }

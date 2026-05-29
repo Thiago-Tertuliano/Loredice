@@ -1,4 +1,4 @@
-import { Result, success, failure } from '../utils/results';
+import { type Result, success, failure } from '../utils/results';
 
 export interface SaveMatchParams {
   tipoJogo: 'truco' | 'universal' | 'uno' | 'outro';
