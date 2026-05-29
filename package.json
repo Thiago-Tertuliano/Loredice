@@ -3,14 +3,41 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "drizzle-orm": "^0.45.2",
     "expo": "~56.0.7",
+    "expo-constants": "~56.0.16",
+    "expo-linking": "~56.0.13",
+    "expo-router": "~56.2.8",
+    "expo-sqlite": "~56.0.4",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
-    "react-native": "0.85.3"
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@eslint/js": "^10.0.1",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "babel-jest": "^30.4.1",
+    "drizzle-kit": "^0.31.10",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-native": "^5.0.0",
+    "husky": "^9.1.7",
+    "jest": "^30.4.2",
+    "jest-expo": "^56.0.4",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.60.0"
   },
   "scripts": {
     "start": "expo start",
