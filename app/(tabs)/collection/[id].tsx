@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet, Image } from 'react-native';
 import { useTheme } from '../../../src/lib/theme';
 import { StarRating } from '../../../src/components/ui/StarRating';
 import { ConservationBadge } from '../../../src/components/ui/ConservationBadge';
 import { CategoryBadge } from '../../../src/components/ui/CategoryBadge';
 import { ConfirmDialog } from '../../../src/components/ui/ConfirmDialog';
+import { GlassCard } from '../../../src/components/ui/GlassCard';
+import { NeonButton } from '../../../src/components/ui/NeonButton';
+import { AppHeader } from '../../../src/components/ui/AppHeader';
 import { obterJogo, deletarJogo } from '../../../src/services/collection';
 import { listarCategoriasDoJogo } from '../../../src/services/categorias';
 import { router, useLocalSearchParams } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface GameView {
   titulo: string;
@@ -19,6 +24,7 @@ interface GameView {
   avaliacao_pessoal: number | null;
   resenha: string | null;
   favorito: boolean | null;
+  imagem_uri: string | null;
 }
 
 export default function GameDetailScreen() {
@@ -56,107 +62,104 @@ export default function GameDetailScreen() {
 
   if (loading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <ActivityIndicator size="large" color={tokens.color.accent} />
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={tokens.color.primary} />
       </View>
     );
   }
 
   if (!game) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ color: tokens.color.textMuted }}>Jogo não encontrado</Text>
-        <Pressable accessibilityRole="button" onPress={() => router.back()}>
-          <Text style={{ color: tokens.color.accent, marginTop: tokens.spacing.md }}>Voltar</Text>
-        </Pressable>
+      <View style={styles.center}>
+        <Text style={[tokens.typography.headlineMd, { color: tokens.color.onSurfaceVariant }]}>
+          Jogo não encontrado
+        </Text>
+        <NeonButton
+          label="Voltar"
+          variant="ghost"
+          onPress={() => router.back()}
+          style={{ marginTop: 16 }}
+        />
       </View>
     );
   }
 
+  // Placeholder color único por jogo
+  const hue = (game.titulo.charCodeAt(0) * 37 + game.titulo.length * 13) % 360;
+  const placeholderBg = `hsl(${hue}, 40%, 14%)`;
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: tokens.color.background }}>
-      <View style={{ padding: tokens.spacing.lg }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Voltar"
-            onPress={() => router.back()}
-          >
-            <Text style={{ color: tokens.color.accent }}>← Voltar</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Editar jogo"
-            onPress={() => router.push(`/(tabs)/collection/edit/${jogoId}`)}
-          >
-            <Text style={{ color: tokens.color.accent }}>Editar</Text>
-          </Pressable>
+    <View style={styles.container}>
+      <AppHeader
+        title=""
+        showBack
+        transparent
+        rightAction={{
+          icon: 'edit',
+          label: 'Editar',
+          onPress: () => router.push(`/(tabs)/collection/edit/${jogoId}`),
+        }}
+      />
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        {/* Hero Image — real photo or placeholder */}
+        <View style={[styles.heroImage, !game.imagem_uri && { backgroundColor: placeholderBg }]}>
+          {game.imagem_uri && (
+            <Image
+              source={{ uri: game.imagem_uri }}
+              style={StyleSheet.absoluteFill}
+              resizeMode="cover"
+            />
+          )}
+          <LinearGradient
+            colors={['transparent', '#0F0D1A']}
+            style={StyleSheet.absoluteFill}
+            locations={[0.45, 1]}
+          />
+          {!game.imagem_uri && (
+            <View style={styles.placeholderIcon}>
+              <MaterialIcons name="casino" size={48} color="rgba(200, 155, 255, 0.15)" />
+            </View>
+          )}
         </View>
 
-        <Text
-          style={{
-            color: tokens.color.text,
-            fontSize: tokens.fontSize.xxl,
-            fontWeight: 'bold',
-            marginTop: tokens.spacing.lg,
-          }}
-        >
-          {game.titulo}
-        </Text>
-
-        {game.editora && (
-          <Text style={{ color: tokens.color.textMuted, marginTop: tokens.spacing.xs }}>
-            {game.editora}
+        {/* Title area */}
+        <View style={styles.headerInfo}>
+          {game.editora && (
+            <Text style={[tokens.typography.labelMd, styles.editora]}>
+              {game.editora.toUpperCase()}
+            </Text>
+          )}
+          <Text style={[tokens.typography.displayLg, { color: tokens.color.primary }]}>
+            {game.titulo}
           </Text>
-        )}
+        </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: tokens.spacing.sm,
-            marginTop: tokens.spacing.md,
-          }}
-        >
+        {/* Info Tags */}
+        <View style={styles.tagsContainer}>
           {(game.qtd_jogadores_min != null || game.qtd_jogadores_max != null) && (
-            <View
-              style={{
-                backgroundColor: tokens.color.surface,
-                borderRadius: tokens.borderRadius.sm,
-                paddingHorizontal: tokens.spacing.sm,
-                paddingVertical: tokens.spacing.xs,
-              }}
-            >
-              <Text style={{ color: tokens.color.textMuted, fontSize: tokens.fontSize.sm }}>
-                {'👥'} {game.qtd_jogadores_min ?? '?'}–{game.qtd_jogadores_max ?? '?'} jogadores
+            <View style={styles.infoPill}>
+              <MaterialIcons
+                name="group"
+                size={14}
+                color={tokens.color.onSurfaceVariant}
+                style={{ marginRight: 4 }}
+              />
+              <Text style={[tokens.typography.labelMd, { color: tokens.color.onSurfaceVariant }]}>
+                {game.qtd_jogadores_min ?? '?'}–{game.qtd_jogadores_max ?? '?'} jog.
               </Text>
             </View>
           )}
           {game.tempo_medio != null && (
-            <View
-              style={{
-                backgroundColor: tokens.color.surface,
-                borderRadius: tokens.borderRadius.sm,
-                paddingHorizontal: tokens.spacing.sm,
-                paddingVertical: tokens.spacing.xs,
-              }}
-            >
-              <Text style={{ color: tokens.color.textMuted, fontSize: tokens.fontSize.sm }}>
-                {'⏱'} {game.tempo_medio} min
+            <View style={styles.infoPill}>
+              <MaterialIcons
+                name="timer"
+                size={14}
+                color={tokens.color.onSurfaceVariant}
+                style={{ marginRight: 4 }}
+              />
+              <Text style={[tokens.typography.labelMd, { color: tokens.color.onSurfaceVariant }]}>
+                {game.tempo_medio} min
               </Text>
             </View>
           )}
@@ -169,76 +172,172 @@ export default function GameDetailScreen() {
           )}
           {game.favorito && (
             <View
-              style={{
-                backgroundColor: tokens.color.gold + '20',
-                borderRadius: tokens.borderRadius.sm,
-                paddingHorizontal: tokens.spacing.sm,
-                paddingVertical: tokens.spacing.xs,
-              }}
+              style={[
+                styles.infoPill,
+                {
+                  backgroundColor: tokens.color.secondaryContainer + '22',
+                  borderColor: tokens.color.secondary + '40',
+                },
+              ]}
             >
-              <Text
-                style={{
-                  color: tokens.color.gold,
-                  fontSize: tokens.fontSize.sm,
-                  fontWeight: 'bold',
-                }}
-              >
-                {'⭐'} Favorito
+              <MaterialIcons
+                name="star"
+                size={14}
+                color={tokens.color.secondary}
+                style={{ marginRight: 4 }}
+              />
+              <Text style={[tokens.typography.labelMd, { color: tokens.color.secondary }]}>
+                Favorito
               </Text>
             </View>
           )}
         </View>
 
         {categorias.length > 0 && (
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              gap: tokens.spacing.xs,
-              marginTop: tokens.spacing.md,
-            }}
-          >
+          <View style={styles.categoriesContainer}>
             {categorias.map((cat) => (
               <CategoryBadge key={cat.id} nome={cat.nome} cor={cat.cor} />
             ))}
           </View>
         )}
 
-        <View style={{ marginTop: tokens.spacing.lg }}>
-          <StarRating value={game.avaliacao_pessoal ?? 0} readonly />
-        </View>
-
-        {game.resenha && (
+        {/* Avaliação */}
+        <GlassCard variant="panel" style={styles.ratingCard}>
           <Text
-            style={{ color: tokens.color.textMuted, marginTop: tokens.spacing.lg, lineHeight: 22 }}
+            style={[tokens.typography.labelMd, { color: tokens.color.primary, marginBottom: 12 }]}
           >
-            {game.resenha}
+            SUA AVALIAÇÃO
           </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <StarRating value={game.avaliacao_pessoal ?? 0} readonly />
+            {game.avaliacao_pessoal != null && game.avaliacao_pessoal > 0 && (
+              <Text
+                style={[
+                  tokens.typography.headlineMd,
+                  { color: tokens.color.secondary, marginLeft: 16 },
+                ]}
+              >
+                {game.avaliacao_pessoal}.0
+              </Text>
+            )}
+          </View>
+        </GlassCard>
+
+        {/* Resenha */}
+        {game.resenha && (
+          <GlassCard style={styles.reviewCard}>
+            <Text style={[tokens.typography.labelMd, styles.reviewLabel]}>SOBRE A EXPERIÊNCIA</Text>
+            <Text style={[tokens.typography.bodyLg, { color: tokens.color.onSurface }]}>
+              {game.resenha}
+            </Text>
+          </GlassCard>
         )}
 
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Excluir jogo"
-          onPress={() => setShowDeleteConfirm(true)}
-          disabled={deleting}
-          style={{ marginTop: tokens.spacing.xl }}
-        >
-          <Text style={{ color: tokens.color.error }}>
-            {deleting ? 'Excluindo...' : 'Excluir Jogo'}
-          </Text>
-        </Pressable>
+        {/* Delete */}
+        <View style={styles.footer}>
+          <NeonButton
+            label={deleting ? 'Excluindo...' : 'Excluir Jogo'}
+            icon="delete"
+            variant="danger"
+            fullWidth
+            onPress={() => setShowDeleteConfirm(true)}
+            disabled={deleting}
+          />
+        </View>
+      </ScrollView>
 
-        <ConfirmDialog
-          visible={showDeleteConfirm}
-          title="Excluir Jogo"
-          message={`Tem certeza que deseja excluir "${game.titulo}"? Esta ação não pode ser desfeita.`}
-          confirmLabel="Excluir"
-          cancelLabel="Cancelar"
-          destructive
-          onConfirm={handleDelete}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      </View>
-    </ScrollView>
+      <ConfirmDialog
+        visible={showDeleteConfirm}
+        title="Excluir Jogo"
+        message={`Tem certeza que deseja excluir "${game.titulo}"? Esta ação não pode ser desfeita e todas as partidas vinculadas perderão a referência do jogo.`}
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        destructive
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0F0D1A',
+  },
+  center: {
+    flex: 1,
+    backgroundColor: '#0F0D1A',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scrollContent: {
+    paddingBottom: 48,
+  },
+  heroImage: {
+    width: '100%',
+    height: 260,
+    marginTop: -64, // pull up under transparent header
+    zIndex: -1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  placeholderIcon: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerInfo: {
+    paddingHorizontal: 16,
+    marginTop: -40,
+  },
+  editora: {
+    color: '#7a6e8a',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginTop: 20,
+  },
+  infoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1829',
+    borderWidth: 1,
+    borderColor: '#3d3450',
+    borderRadius: 9999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    marginTop: 14,
+  },
+  ratingCard: {
+    marginHorizontal: 16,
+    marginTop: 28,
+    padding: 20,
+  },
+  reviewCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 24,
+  },
+  reviewLabel: {
+    color: '#8b3fcc',
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  footer: {
+    paddingHorizontal: 16,
+    marginTop: 40,
+    marginBottom: 16,
+  },
+});

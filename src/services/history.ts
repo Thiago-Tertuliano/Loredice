@@ -22,11 +22,23 @@ export async function listarHistorico(): Promise<Result<MatchWithWinner[], AppEr
         tipoJogo: partidas.tipoJogo,
         data: partidas.data,
         duracao: partidas.duracao,
-        vencedorNome: jogadores.nome,
+        // Preferir vencedorNome salvo diretamente; fallback para JOIN com jogadores
+        vencedorNome: partidas.vencedorNome,
+        vencedorNomeJoin: jogadores.nome,
       })
       .from(partidas)
       .leftJoin(jogadores, eq(partidas.vencedorId, jogadores.id))
       .orderBy(partidas.data);
-    return { success: true, data: data as MatchWithWinner[] };
+
+    // Resolve o nome do vencedor: campo direto > join
+    const mapped: MatchWithWinner[] = data.map((row) => ({
+      id: row.id,
+      tipoJogo: row.tipoJogo,
+      data: row.data,
+      duracao: row.duracao,
+      vencedorNome: row.vencedorNome ?? row.vencedorNomeJoin ?? null,
+    }));
+
+    return { success: true, data: mapped };
   }, 'listarHistorico');
 }

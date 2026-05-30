@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../lib/theme';
 import { listarCategorias } from '../../services/categorias';
 
@@ -32,36 +32,64 @@ export function CategorySelector({ selectedIds, onChange }: Props) {
   if (categorias.length === 0) return null;
 
   return (
-    <View style={{ marginTop: tokens.spacing.md }}>
-      <Text style={{ color: tokens.color.textMuted, marginBottom: tokens.spacing.sm }}>
-        Categorias
+    <View style={styles.wrapper}>
+      <Text
+        style={[
+          tokens.typography.labelMd,
+          { color: tokens.color.onSurfaceVariant, marginBottom: 12 },
+        ]}
+      >
+        CATEGORIAS
       </Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: tokens.spacing.sm }}>
+      <View style={styles.grid}>
         {categorias.map((cat) => {
           const selected = selectedIds.includes(cat.id);
-          const bgColor = cat.cor ?? '#6366F1';
+          const baseColor = cat.cor ?? '#8b3fcc';
           return (
-            <Pressable
+            <TouchableOpacity
               key={cat.id}
               accessibilityRole="button"
               accessibilityLabel={`${selected ? 'Remover' : 'Adicionar'} categoria ${cat.nome}`}
               onPress={() => toggle(cat.id)}
-              style={{
-                backgroundColor: selected ? bgColor : bgColor + '20',
-                borderRadius: tokens.borderRadius.md,
-                paddingHorizontal: tokens.spacing.md,
-                paddingVertical: tokens.spacing.sm,
-                borderWidth: 1,
-                borderColor: selected ? bgColor : bgColor + '40',
-              }}
+              activeOpacity={0.7}
+              style={[
+                styles.badge,
+                {
+                  backgroundColor: selected ? baseColor : baseColor + '15',
+                  borderColor: selected ? baseColor : baseColor + '30',
+                },
+              ]}
             >
-              <Text style={{ color: selected ? '#FFF' : bgColor, fontWeight: 'bold' }}>
+              <Text
+                style={[
+                  tokens.typography.labelMd,
+                  { color: selected ? '#FFF' : baseColor, fontSize: 12 },
+                ]}
+              >
                 {cat.nome}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           );
         })}
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  wrapper: {
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  badge: {
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+  },
+});

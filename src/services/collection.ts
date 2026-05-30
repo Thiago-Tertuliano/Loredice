@@ -20,6 +20,7 @@ export interface GameFormData {
   avaliacaoPessoal?: number | null;
   resenha?: string | null;
   favorito?: boolean | null;
+  imagemUri?: string | null;
   categoriaIds?: number[];
 }
 
@@ -82,6 +83,7 @@ export async function criarJogo(
         avaliacaoPessoal: data.avaliacaoPessoal ?? null,
         resenha: data.resenha ?? null,
         favorito: data.favorito ?? false,
+        imagemUri: data.imagemUri ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -112,15 +114,15 @@ export async function atualizarJogo(
 
     if (data.titulo !== undefined) updateData.titulo = data.titulo;
     if (data.editora !== undefined) updateData.editora = data.editora;
-    if (data.qtdJogadoresMin !== undefined) updateData.qtd_jogadores_min = data.qtdJogadoresMin;
-    if (data.qtdJogadoresMax !== undefined) updateData.qtd_jogadores_max = data.qtdJogadoresMax;
-    if (data.tempoMedio !== undefined) updateData.tempo_medio = data.tempoMedio;
-    if (data.estadoConservacao !== undefined)
-      updateData.estado_conservacao = data.estadoConservacao;
-    if (data.checklistPecas !== undefined) updateData.checklist_pecas = data.checklistPecas;
-    if (data.avaliacaoPessoal !== undefined) updateData.avaliacao_pessoal = data.avaliacaoPessoal;
+    if (data.qtdJogadoresMin !== undefined) updateData.qtdJogadoresMin = data.qtdJogadoresMin;
+    if (data.qtdJogadoresMax !== undefined) updateData.qtdJogadoresMax = data.qtdJogadoresMax;
+    if (data.tempoMedio !== undefined) updateData.tempoMedio = data.tempoMedio;
+    if (data.estadoConservacao !== undefined) updateData.estadoConservacao = data.estadoConservacao;
+    if (data.checklistPecas !== undefined) updateData.checklistPecas = data.checklistPecas;
+    if (data.avaliacaoPessoal !== undefined) updateData.avaliacaoPessoal = data.avaliacaoPessoal;
     if (data.resenha !== undefined) updateData.resenha = data.resenha;
     if (data.favorito !== undefined) updateData.favorito = data.favorito;
+    if (data.imagemUri !== undefined) updateData.imagemUri = data.imagemUri;
 
     await db.update(jogosColecao).set(updateData).where(eq(jogosColecao.id, id));
 

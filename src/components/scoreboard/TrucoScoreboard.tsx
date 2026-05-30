@@ -1,136 +1,122 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useScoreboardStore } from '../../stores/useScoreboardStore';
 import { useTheme } from '../../lib/theme';
 import { Timer } from './Timer';
 import { PlayerScoreCard } from './PlayerScoreCard';
+import { NeonButton } from '../ui/NeonButton';
 
 export function TrucoScoreboard() {
   const { tokens } = useTheme();
   const { players, addPlayer, incrementScore, decrementScore, winnerId, reset, limit } =
     useScoreboardStore();
 
-  const isTeamAFull = players.length >= 1; // time A = 1 jogador hardcoded para V1
+  const isTeamAFull = players.length >= 1;
   const isTeamBFull = players.length >= 2;
 
   if (players.length < 2) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-          padding: tokens.spacing.lg,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ color: tokens.color.text, fontSize: tokens.fontSize.lg }}>
-          Adicione 2 jogadores
+      <View style={styles.centerContainer}>
+        <Text
+          style={[tokens.typography.headlineMd, { color: tokens.color.onSurface, marginBottom: 8 }]}
+        >
+          Adicione 2 times para começar
         </Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Adicionar Time A"
-          onPress={() => addPlayer('Time A')}
+        <Text
+          style={[
+            tokens.typography.bodyMd,
+            { color: tokens.color.onSurfaceVariant, textAlign: 'center', marginBottom: 32 },
+          ]}
+        >
+          Primeiro time a chegar em {limit} pontos vence!
+        </Text>
+        <NeonButton
+          label="Adicionar Nós"
+          variant="primary"
+          onPress={() => addPlayer('Nós')}
           disabled={isTeamAFull}
-          style={{
-            backgroundColor: tokens.color.accent,
-            borderRadius: tokens.borderRadius.md,
-            padding: tokens.spacing.md,
-            marginTop: tokens.spacing.md,
-            opacity: isTeamAFull ? 0.5 : 1,
-          }}
-        >
-          <Text style={{ color: tokens.color.text }}>Adicionar Time A</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Adicionar Time B"
-          onPress={() => addPlayer('Time B')}
+          style={{ marginBottom: 16, minWidth: 200 }}
+        />
+        <NeonButton
+          label="Adicionar Eles"
+          variant="secondary"
+          onPress={() => addPlayer('Eles')}
           disabled={isTeamBFull}
-          style={{
-            backgroundColor: tokens.color.gold,
-            borderRadius: tokens.borderRadius.md,
-            padding: tokens.spacing.md,
-            marginTop: tokens.spacing.md,
-            opacity: isTeamBFull ? 0.5 : 1,
-          }}
-        >
-          <Text style={{ color: tokens.color.background }}>Adicionar Time B</Text>
-        </Pressable>
+          style={{ minWidth: 200 }}
+        />
       </View>
     );
   }
 
   const teamA = players[0]!;
   const teamB = players[1]!;
-  const winner = winnerId ? players.find((p) => p.id === winnerId) : null;
-
-  if (winner) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: tokens.color.background,
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: tokens.spacing.lg,
-        }}
-      >
-        <Text
-          accessibilityRole="header"
-          style={{ color: tokens.color.gold, fontSize: tokens.fontSize.xxl, fontWeight: 'bold' }}
-        >
-          🏆 {winner.name} venceu!
-        </Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Nova partida"
-          onPress={reset}
-          style={{
-            backgroundColor: tokens.color.accent,
-            borderRadius: tokens.borderRadius.md,
-            padding: tokens.spacing.md,
-            marginTop: tokens.spacing.lg,
-          }}
-        >
-          <Text style={{ color: tokens.color.text }}>Nova Partida</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  const isWinnerA = winnerId === teamA.id;
+  const isWinnerB = winnerId === teamB.id;
 
   return (
-    <View style={{ flex: 1, backgroundColor: tokens.color.background, padding: tokens.spacing.lg }}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
       <Timer />
-      <Text
-        style={{ color: tokens.color.textMuted, textAlign: 'center', marginTop: tokens.spacing.sm }}
-      >
-        Primeiro a {limit} vence
+
+      <Text style={[tokens.typography.labelMd, styles.limitLabel]}>
+        PRIMEIRO A {limit} PONTOS VENCE
       </Text>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          marginTop: tokens.spacing.lg,
-        }}
-      >
+      <View style={styles.teamsContainer}>
         <PlayerScoreCard
           name={teamA.name}
           score={teamA.score}
-          isWinner={false}
+          isWinner={isWinnerA}
           onIncrement={() => incrementScore(teamA.id)}
           onDecrement={() => decrementScore(teamA.id)}
-          accessibilityLabelPrefix="Time A: "
+          variant="truco"
         />
+
         <PlayerScoreCard
           name={teamB.name}
           score={teamB.score}
-          isWinner={false}
+          isWinner={isWinnerB}
           onIncrement={() => incrementScore(teamB.id)}
           onDecrement={() => decrementScore(teamB.id)}
-          accessibilityLabelPrefix="Time B: "
+          variant="truco"
         />
       </View>
-    </View>
+
+      {(isWinnerA || isWinnerB) && (
+        <View style={styles.actionContainer}>
+          <NeonButton
+            label="Nova Partida"
+            icon="replay"
+            variant="primary"
+            fullWidth
+            onPress={reset}
+          />
+        </View>
+      )}
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  scrollContainer: {
+    paddingBottom: 40,
+  },
+  limitLabel: {
+    color: '#7a6e8a',
+    textAlign: 'center',
+    letterSpacing: 1.5,
+    marginBottom: 16,
+    marginTop: 4,
+  },
+  teamsContainer: {
+    marginTop: 8,
+  },
+  actionContainer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+});

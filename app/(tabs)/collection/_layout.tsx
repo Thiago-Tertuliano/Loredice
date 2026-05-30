@@ -9,6 +9,7 @@ export default function CollectionLayout() {
         <Stack.Screen name="[id]" />
         <Stack.Screen name="new" />
         <Stack.Screen name="edit/[id]" />
+        <Stack.Screen name="gallery" />
       </Stack>
     </ErrorBoundary>
   );

@@ -1,4 +1,5 @@
-import { View, Pressable, Text } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../lib/theme';
 
 interface Props {
@@ -13,19 +14,23 @@ export function StarRating({ value, onChange, readonly = false }: Props) {
   return (
     <View
       accessibilityLabel={`Avaliação: ${value} de 5 estrelas`}
-      style={{ flexDirection: 'row', gap: tokens.spacing.xs }}
+      style={{ flexDirection: 'row', gap: 4 }}
     >
       {[1, 2, 3, 4, 5].map((star) => (
-        <Pressable
+        <TouchableOpacity
           key={star}
           accessibilityRole="button"
           accessibilityLabel={`${star} estrela${star > 1 ? 's' : ''}`}
           onPress={() => onChange?.(star)}
           disabled={readonly}
-          style={{ opacity: star <= value ? 1 : 0.3 }}
+          activeOpacity={readonly ? 1 : 0.7}
         >
-          <Text style={{ fontSize: 28 }}>{star <= value ? '★' : '☆'}</Text>
-        </Pressable>
+          <MaterialIcons
+            name={star <= value ? 'star' : 'star-border'}
+            size={36}
+            color={star <= value ? tokens.color.secondary : tokens.color.onSurfaceVariant}
+          />
+        </TouchableOpacity>
       ))}
     </View>
   );

@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useScoreboardStore } from '../../stores/useScoreboardStore';
 import { useTheme } from '../../lib/theme';
 import { Timer } from './Timer';
 import { PlayerScoreCard } from './PlayerScoreCard';
 import { validarJogadores } from '../../services/scoreboard';
+import { GlassInput } from '../ui/GlassInput';
+import { NeonButton } from '../ui/NeonButton';
+import { NumberField } from '../ui/NumberField';
+import { GlassCard } from '../ui/GlassCard';
 
 export function UniversalScoreboard() {
   const { tokens } = useTheme();
@@ -35,125 +39,106 @@ export function UniversalScoreboard() {
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: tokens.color.background, padding: tokens.spacing.lg }}
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
     >
       <Timer />
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginTop: tokens.spacing.md,
-          gap: tokens.spacing.sm,
-        }}
-      >
-        <Text accessibilityLabel="Limite de pontos" style={{ color: tokens.color.textMuted }}>
-          Limite:
-        </Text>
-        <TextInput
-          accessibilityLabel="Limite de pontos"
-          keyboardType="number-pad"
-          value={String(limit)}
-          onChangeText={(v) => setLimit(Number(v) || 12)}
-          style={{
-            backgroundColor: tokens.color.surface,
-            color: tokens.color.text,
-            borderRadius: tokens.borderRadius.md,
-            padding: tokens.spacing.sm,
-            width: 60,
-            textAlign: 'center',
-          }}
-        />
-      </View>
+      <GlassCard variant="panel" style={styles.configCard}>
+        <View style={styles.limitRow}>
+          <Text style={[tokens.typography.headlineMd, { color: tokens.color.onSurface }]}>
+            Pontuação Máxima
+          </Text>
+          <NumberField
+            label=""
+            value={limit}
+            onChange={(v) => setLimit(v || 12)}
+            min={1}
+            layout="horizontal"
+          />
+        </View>
 
-      <View style={{ flexDirection: 'row', marginTop: tokens.spacing.md, gap: tokens.spacing.sm }}>
-        <TextInput
-          accessibilityLabel="Nome do novo jogador"
-          placeholder="Nome do jogador"
-          placeholderTextColor={tokens.color.textMuted}
-          value={newName}
-          onChangeText={setNewName}
-          onSubmitEditing={handleAdd}
-          style={{
-            flex: 1,
-            backgroundColor: tokens.color.surface,
-            color: tokens.color.text,
-            borderRadius: tokens.borderRadius.md,
-            padding: tokens.spacing.md,
-          }}
-        />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Adicionar jogador"
-          onPress={handleAdd}
-          style={{
-            backgroundColor: tokens.color.accent,
-            borderRadius: tokens.borderRadius.md,
-            paddingHorizontal: tokens.spacing.lg,
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: tokens.color.text, fontWeight: 'bold' }}>+</Text>
-        </Pressable>
-      </View>
-      {error && (
-        <Text style={{ color: tokens.color.error, marginTop: tokens.spacing.xs }}>{error}</Text>
-      )}
+        <View style={styles.addPlayerRow}>
+          <View style={{ flex: 1, marginRight: 8 }}>
+            <GlassInput
+              placeholder="Adicionar jogador..."
+              icon="person-add"
+              value={newName}
+              onChangeText={setNewName}
+              onSubmitEditing={handleAdd}
+              error={error || undefined}
+            />
+          </View>
+          <NeonButton
+            label="ADD"
+            variant="primary"
+            onPress={handleAdd}
+            style={{ height: 50, marginTop: -16 }}
+          />
+        </View>
+      </GlassCard>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: tokens.spacing.md,
-          marginTop: tokens.spacing.lg,
-        }}
-      >
+      <View style={styles.playersGrid}>
         {players.map((player) => (
-          <View key={player.id}>
+          <View key={player.id} style={styles.playerWrapper}>
             <PlayerScoreCard
               name={player.name}
               score={player.score}
               isWinner={player.id === winnerId}
               onIncrement={() => incrementScore(player.id)}
               onDecrement={() => decrementScore(player.id)}
+              onRemove={() => removePlayer(player.id)}
+              variant="universal"
             />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={`Remover ${player.name}`}
-              onPress={() => removePlayer(player.id)}
-              style={{ alignSelf: 'center', marginTop: tokens.spacing.xs }}
-            >
-              <Text style={{ color: tokens.color.error, fontSize: tokens.fontSize.sm }}>
-                Remover
-              </Text>
-            </Pressable>
           </View>
         ))}
       </View>
 
       {winnerId && (
-        <View style={{ alignItems: 'center', marginTop: tokens.spacing.xl }}>
-          <Text
-            accessibilityRole="header"
-            style={{ color: tokens.color.gold, fontSize: tokens.fontSize.xxl, fontWeight: 'bold' }}
-          >
-            🏆 {players.find((p) => p.id === winnerId)?.name} venceu!
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Nova partida"
+        <View style={styles.winnerAction}>
+          <NeonButton
+            label="Nova Partida"
+            icon="replay"
+            variant="primary"
+            fullWidth
             onPress={reset}
-            style={{
-              backgroundColor: tokens.color.accent,
-              borderRadius: tokens.borderRadius.md,
-              padding: tokens.spacing.md,
-              marginTop: tokens.spacing.md,
-            }}
-          >
-            <Text style={{ color: tokens.color.text }}>Nova Partida</Text>
-          </Pressable>
+          />
         </View>
       )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  configCard: {
+    padding: 20,
+    marginBottom: 24,
+  },
+  limitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  addPlayerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  playersGrid: {
+    gap: 0,
+  },
+  playerWrapper: {
+    width: '100%',
+  },
+  winnerAction: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+});

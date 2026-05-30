@@ -11,6 +11,7 @@ export const partidas = sqliteTable('partidas', {
   data: text('data').notNull(),
   duracao: integer('duracao'), // segundos
   vencedorId: integer('vencedor_id').references(() => jogadores.id),
+  vencedorNome: text('vencedor_nome'), // fallback textual — salvo diretamente para garantir histórico correto
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS \`partidas\` (
   \`data\` text NOT NULL,
   \`duracao\` integer,
   \`vencedor_id\` integer,
+  \`vencedor_nome\` text,
   \`created_at\` text NOT NULL,
   \`updated_at\` text NOT NULL,
   FOREIGN KEY (\`jogo_id\`) REFERENCES \`jogos_colecao\`(\`id\`),
@@ -74,10 +75,10 @@ export async function initializeDatabase() {
   }
 
   if (version < 2) {
-    const row = await sqlite.getFirstAsync<{ count: number }>(
+    const countRow = await sqlite.getFirstAsync<{ count: number }>(
       'SELECT COUNT(*) as count FROM categorias',
     );
-    if (!row || row.count === 0) {
+    if (!countRow || countRow.count === 0) {
       const now = new Date().toISOString();
       for (const cat of SEED_CATEGORIAS) {
         await sqlite.runAsync(
@@ -90,5 +91,23 @@ export async function initializeDatabase() {
       }
     }
     await sqlite.execAsync('PRAGMA user_version = 2');
+  }
+
+  if (version < 3) {
+    // Migração v3: adicionar coluna imagem_uri em jogos_colecao
+    try {
+      await sqlite.execAsync('ALTER TABLE jogos_colecao ADD COLUMN imagem_uri text');
+    } catch {
+      // Coluna já existe — ignorar silenciosamente
+    }
+
+    // Migração v3: adicionar coluna vencedor_nome em partidas (fallback textual)
+    try {
+      await sqlite.execAsync('ALTER TABLE partidas ADD COLUMN vencedor_nome text');
+    } catch {
+      // Coluna já existe — ignorar silenciosamente
+    }
+
+    await sqlite.execAsync('PRAGMA user_version = 3');
   }
 }
