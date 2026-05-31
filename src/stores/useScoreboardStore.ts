@@ -4,6 +4,7 @@ interface Player {
   id: string;
   name: string;
   score: number;
+  color?: string;
 }
 
 interface ScoreboardState {
@@ -15,7 +16,7 @@ interface ScoreboardState {
   winnerId: string | null;
 
   setMode: (mode: ScoreboardState['mode']) => void;
-  addPlayer: (name: string) => void;
+  addPlayer: (name: string, color?: string) => void;
   removePlayer: (id: string) => void;
   incrementScore: (playerId: string, amount?: number) => void;
   decrementScore: (playerId: string, amount?: number) => void;
@@ -38,9 +39,9 @@ export const useScoreboardStore = create<ScoreboardState>((set, get) => ({
 
   setMode: (mode) => set({ mode, players: [], winnerId: null, elapsedSeconds: 0 }),
 
-  addPlayer: (name) =>
+  addPlayer: (name, color) =>
     set((state) => ({
-      players: [...state.players, { id: crypto.randomUUID(), name, score: 0 }],
+      players: [...state.players, { id: Date.now().toString() + Math.random().toString(36).substring(7), name, score: 0, color }],
     })),
 
   removePlayer: (id) =>

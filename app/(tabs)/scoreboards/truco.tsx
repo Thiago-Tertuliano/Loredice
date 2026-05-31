@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { useScoreboardStore } from '../../../src/stores/useScoreboardStore';
 import { useTheme } from '../../../src/lib/theme';
 import { TrucoScoreboard } from '../../../src/components/scoreboard/TrucoScoreboard';
-import { router } from 'expo-router';
+import { AppHeader } from '../../../src/components/ui/AppHeader';
 import { saveMatch } from '../../../src/services/match-storage';
 
 export default function TrucoScreen() {
@@ -30,21 +30,7 @@ export default function TrucoScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: tokens.color.background }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          padding: tokens.spacing.md,
-        }}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Voltar"
-          onPress={() => router.back()}
-        >
-          <Text style={{ color: tokens.color.accent, fontSize: tokens.fontSize.lg }}>← Voltar</Text>
-        </Pressable>
-      </View>
+      <AppHeader title="Partida de Truco" showBack transparent />
       <TrucoScoreboard />
     </View>
   );

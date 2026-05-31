@@ -4,7 +4,6 @@ import { useScoreboardStore } from '../../stores/useScoreboardStore';
 import { useTheme } from '../../lib/theme';
 import { Timer } from './Timer';
 import { PlayerScoreCard } from './PlayerScoreCard';
-import { validarJogadores } from '../../services/scoreboard';
 import { GlassInput } from '../ui/GlassInput';
 import { NeonButton } from '../ui/NeonButton';
 import { NumberField } from '../ui/NumberField';
@@ -27,12 +26,16 @@ export function UniversalScoreboard() {
   const [error, setError] = useState<string | null>(null);
 
   const handleAdd = () => {
-    const result = validarJogadores([...players.map((p) => p.name), newName]);
-    if (!result.success) {
-      setError(result.error);
+    const trimmedName = newName.trim();
+    if (!trimmedName) {
+      setError('Nome não pode estar vazio');
       return;
     }
-    addPlayer(newName.trim());
+    if (players.some((p) => p.name.toLowerCase() === trimmedName.toLowerCase())) {
+      setError('Este jogador já está no placar');
+      return;
+    }
+    addPlayer(trimmedName);
     setNewName('');
     setError(null);
   };

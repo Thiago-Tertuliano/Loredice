@@ -27,53 +27,56 @@ export function Timer() {
   const timeDisplay = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
   return (
-    <View accessibilityLabel={`Tempo: ${formatarTempo(elapsedSeconds)}`} style={styles.container}>
-      <View style={styles.timeWrapper}>
-        <MaterialIcons
-          name="timer"
-          size={16}
-          color={tokens.color.onSurfaceVariant}
-          style={{ marginRight: 8 }}
-        />
-        <Text
-          style={[
-            styles.timeText,
-            { fontFamily: 'Poppins_700Bold', color: tokens.color.onSurface },
-          ]}
-        >
-          {timeDisplay}
-        </Text>
-      </View>
-
-      <View style={styles.controls}>
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel={isRunning ? 'Pausar cronômetro' : 'Iniciar cronômetro'}
-          onPress={isRunning ? stopTimer : startTimer}
-          style={[
-            styles.controlBtn,
-            {
-              backgroundColor: isRunning
-                ? tokens.color.error + '20'
-                : tokens.color.primaryContainer + '30',
-            },
-          ]}
-        >
+    <View style={styles.container}>
+      <View style={styles.glassRectangle}>
+        <View style={styles.timeWrapper}>
           <MaterialIcons
-            name={isRunning ? 'pause' : 'play-arrow'}
-            size={20}
-            color={isRunning ? tokens.color.error : tokens.color.primary}
+            name="timer"
+            size={24}
+            color={tokens.color.onSurfaceVariant}
+            style={{ marginRight: 12, marginTop: 4 }}
           />
-        </TouchableOpacity>
+          <Text
+            accessibilityLabel={`Tempo: ${formatarTempo(elapsedSeconds)}`}
+            style={[
+              styles.timeText,
+              { fontFamily: 'Poppins_700Bold', color: tokens.color.onSurface },
+            ]}
+          >
+            {timeDisplay}
+          </Text>
+        </View>
 
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel="Resetar cronômetro"
-          onPress={resetTimer}
-          style={[styles.controlBtn, { backgroundColor: tokens.color.surfaceContainerHigh }]}
-        >
-          <MaterialIcons name="replay" size={18} color={tokens.color.onSurfaceVariant} />
-        </TouchableOpacity>
+        <View style={styles.controls}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={isRunning ? 'Pausar cronômetro' : 'Iniciar cronômetro'}
+            onPress={isRunning ? stopTimer : startTimer}
+            style={[
+              styles.controlBtn,
+              {
+                backgroundColor: isRunning
+                  ? tokens.color.error + '20'
+                  : tokens.color.primaryContainer + '30',
+              },
+            ]}
+          >
+            <MaterialIcons
+              name={isRunning ? 'pause' : 'play-arrow'}
+              size={32}
+              color={isRunning ? tokens.color.error : tokens.color.primary}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Resetar cronômetro"
+            onPress={resetTimer}
+            style={[styles.controlBtn, { backgroundColor: tokens.color.surfaceContainerHigh }]}
+          >
+            <MaterialIcons name="replay" size={24} color={tokens.color.onSurfaceVariant} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -81,30 +84,38 @@ export function Timer() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    paddingHorizontal: 4,
-    marginBottom: 8,
+    marginBottom: 16,
+  },
+  glassRectangle: {
+    backgroundColor: 'rgba(26, 24, 41, 0.6)',
+    borderRadius: 24,
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(200, 155, 255, 0.1)',
+    minWidth: 220,
   },
   timeWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
   },
   timeText: {
-    fontSize: 28,
-    letterSpacing: 2,
+    fontSize: 48,
+    letterSpacing: 4,
     fontVariant: ['tabular-nums'],
+    lineHeight: 56,
   },
   controls: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 16,
   },
   controlBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },

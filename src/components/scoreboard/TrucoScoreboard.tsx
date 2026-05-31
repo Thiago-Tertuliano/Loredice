@@ -1,49 +1,59 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useScoreboardStore } from '../../stores/useScoreboardStore';
 import { useTheme } from '../../lib/theme';
 import { Timer } from './Timer';
 import { PlayerScoreCard } from './PlayerScoreCard';
 import { NeonButton } from '../ui/NeonButton';
+import { GlassInput } from '../ui/GlassInput';
+
+const TEAM_COLORS = ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#EF4444'];
 
 export function TrucoScoreboard() {
   const { tokens } = useTheme();
   const { players, addPlayer, incrementScore, decrementScore, winnerId, reset, limit } =
     useScoreboardStore();
 
-  const isTeamAFull = players.length >= 1;
-  const isTeamBFull = players.length >= 2;
+  const [teamAName, setTeamAName] = useState('Nós');
+  const [teamBName, setTeamBName] = useState('Eles');
+  const [teamAColor, setTeamAColor] = useState(TEAM_COLORS[0]);
+  const [teamBColor, setTeamBColor] = useState(TEAM_COLORS[3]);
 
   if (players.length < 2) {
+    const handleStart = () => {
+      addPlayer(teamAName || 'Nós', teamAColor);
+      addPlayer(teamBName || 'Eles', teamBColor);
+    };
+
     return (
-      <View style={styles.centerContainer}>
-        <Text
-          style={[tokens.typography.headlineMd, { color: tokens.color.onSurface, marginBottom: 8 }]}
-        >
-          Adicione 2 times para começar
+      <ScrollView contentContainerStyle={styles.centerContainer} showsVerticalScrollIndicator={false}>
+        <Text style={[tokens.typography.headlineMd, { color: tokens.color.onSurface, marginBottom: 8 }]}>
+          Configurar Partida
         </Text>
-        <Text
-          style={[
-            tokens.typography.bodyMd,
-            { color: tokens.color.onSurfaceVariant, textAlign: 'center', marginBottom: 32 },
-          ]}
-        >
-          Primeiro time a chegar em {limit} pontos vence!
+        <Text style={[tokens.typography.bodyMd, { color: tokens.color.onSurfaceVariant, textAlign: 'center', marginBottom: 32 }]}>
+          Primeiro a chegar em {limit} pontos vence!
         </Text>
-        <NeonButton
-          label="Adicionar Nós"
-          variant="primary"
-          onPress={() => addPlayer('Nós')}
-          disabled={isTeamAFull}
-          style={{ marginBottom: 16, minWidth: 200 }}
-        />
-        <NeonButton
-          label="Adicionar Eles"
-          variant="secondary"
-          onPress={() => addPlayer('Eles')}
-          disabled={isTeamBFull}
-          style={{ minWidth: 200 }}
-        />
-      </View>
+
+        <View style={styles.teamSetupCard}>
+          <GlassInput label="Time 1" value={teamAName} onChangeText={setTeamAName} placeholder="Ex: Nós" icon="groups" />
+          <View style={styles.colorRow}>
+            {TEAM_COLORS.map(c => (
+              <TouchableOpacity key={c} onPress={() => setTeamAColor(c)} style={[styles.colorCircle, { backgroundColor: c }, teamAColor === c && styles.colorSelected]} />
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.teamSetupCard}>
+          <GlassInput label="Time 2" value={teamBName} onChangeText={setTeamBName} placeholder="Ex: Eles" icon="groups" />
+          <View style={styles.colorRow}>
+            {TEAM_COLORS.map(c => (
+              <TouchableOpacity key={c} onPress={() => setTeamBColor(c)} style={[styles.colorCircle, { backgroundColor: c }, teamBColor === c && styles.colorSelected]} />
+            ))}
+          </View>
+        </View>
+
+        <NeonButton label="Iniciar Partida" variant="primary" icon="play-arrow" onPress={handleStart} style={{ marginTop: 16, minWidth: '100%' }} />
+      </ScrollView>
     );
   }
 
@@ -64,6 +74,7 @@ export function TrucoScoreboard() {
         <PlayerScoreCard
           name={teamA.name}
           score={teamA.score}
+          color={teamA.color}
           isWinner={isWinnerA}
           onIncrement={() => incrementScore(teamA.id)}
           onDecrement={() => decrementScore(teamA.id)}
@@ -73,6 +84,7 @@ export function TrucoScoreboard() {
         <PlayerScoreCard
           name={teamB.name}
           score={teamB.score}
+          color={teamB.color}
           isWinner={isWinnerB}
           onIncrement={() => incrementScore(teamB.id)}
           onDecrement={() => decrementScore(teamB.id)}
@@ -97,10 +109,36 @@ export function TrucoScoreboard() {
 
 const styles = StyleSheet.create({
   centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 24,
+    paddingTop: 12,
+  },
+  teamSetupCard: {
+    width: '100%',
+    backgroundColor: 'rgba(26, 24, 41, 0.4)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(200, 155, 255, 0.1)',
+  },
+  colorRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    paddingHorizontal: 4,
+  },
+  colorCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    opacity: 0.5,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  colorSelected: {
+    opacity: 1,
+    borderColor: '#FFF',
+    transform: [{ scale: 1.1 }],
   },
   scrollContainer: {
     paddingBottom: 40,

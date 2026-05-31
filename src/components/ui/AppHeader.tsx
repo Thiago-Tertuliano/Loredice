@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { UserAvatar } from './UserAvatar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface AppHeaderProps {
   title?: string;
@@ -32,6 +33,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   const { tokens } = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const handleBack = () => {
     if (onBackPress) {
@@ -123,7 +125,7 @@ export function AppHeader({
   );
 
   if (transparent) {
-    return <View style={styles.container}>{content}</View>;
+    return <View style={[styles.container, { paddingTop: insets.top, height: 64 + insets.top }]}>{content}</View>;
   }
 
   return (
@@ -133,6 +135,8 @@ export function AppHeader({
       style={[
         styles.container,
         {
+          paddingTop: insets.top,
+          height: 64 + insets.top,
           borderBottomColor: tokens.color.primary + '22',
           borderBottomWidth: 1,
         },

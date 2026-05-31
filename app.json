@@ -26,14 +26,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-status-bar",
       "expo-sqlite",
       [
         "expo-image-picker",
         {
           "photosPermission": "O LoreDice precisa acessar sua galeria para adicionar fotos dos jogos."
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

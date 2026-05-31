@@ -6,19 +6,18 @@ import { initializeDatabase } from '../src/lib/initialize-database';
 import { useLoreDiceFonts } from '../src/lib/fonts';
 import { View } from 'react-native';
 
-// Mantém a splash screen visível até as fontes carregarem
-SplashScreen.preventAutoHideAsync();
-
+// SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const { fontsLoaded, fontError } = useLoreDiceFonts();
 
-  useEffect(() => {
-    initializeDatabase();
+  useEffect(() => {1
+    initializeDatabase().catch(err => console.error("Database init error:", err));
   }, []);
 
   useEffect(() => {
+    console.log("Fonts status:", { fontsLoaded, fontError });
     if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(err => console.error("Splash hide error:", err));
     }
   }, [fontsLoaded, fontError]);
 

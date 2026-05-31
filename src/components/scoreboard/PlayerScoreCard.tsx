@@ -8,12 +8,13 @@ interface Props {
   name: string;
   score: number;
   isWinner: boolean;
-  onIncrement: () => void;
+  onIncrement: (amount?: number) => void;
   onDecrement: () => void;
   onRemove?: () => void;
   _accessibilityLabelPrefix?: string;
   subLabel?: string;
   variant?: 'truco' | 'universal';
+  color?: string;
 }
 
 export function PlayerScoreCard({
@@ -26,6 +27,7 @@ export function PlayerScoreCard({
   _accessibilityLabelPrefix = '',
   subLabel = '',
   variant = 'universal',
+  color,
 }: Props) {
   const { tokens } = useTheme();
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -48,7 +50,7 @@ export function PlayerScoreCard({
       <View
         style={[
           styles.trucoContainer,
-          isWinner ? styles.winnerBg : styles.normalBg,
+          isWinner ? styles.winnerBg : [styles.normalBg, color ? { borderColor: color, backgroundColor: color + '10' } : {}],
           isWinner && tokens.shadow.winnerGlow,
         ]}
       >
@@ -115,7 +117,7 @@ export function PlayerScoreCard({
                     ...tokens.shadow.neonGlowPurple,
                   },
             ]}
-            onPress={onIncrement}
+            onPress={() => onIncrement(1)}
           >
             <MaterialIcons
               name="add"
@@ -123,6 +125,21 @@ export function PlayerScoreCard({
               color={isWinner ? tokens.color.secondary : tokens.color.onPrimaryContainer}
             />
           </TouchableOpacity>
+        </View>
+
+        <View style={styles.trucoTagsRow}>
+          {[3, 6, 9, 12].map(pts => (
+            <TouchableOpacity
+              key={pts}
+              style={[
+                styles.trucoTag,
+                { borderColor: color ? color + '40' : tokens.color.primary + '40' },
+              ]}
+              onPress={() => onIncrement(pts)}
+            >
+              <Text style={[tokens.typography.labelMd, { color: color || tokens.color.primary, fontSize: 13 }]}>+{pts}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {isWinner && (
@@ -146,9 +163,13 @@ export function PlayerScoreCard({
   return (
     <GlassCard
       variant="panel"
-      neonGlow={isWinner}
-      glowColor="purple"
-      style={[styles.universalContainer, isWinner ? tokens.shadow.winnerGlow : {}]}
+      neonGlow={isWinner || !!color}
+      glowColor={isWinner ? 'purple' : undefined}
+      style={[
+        styles.universalContainer, 
+        isWinner ? tokens.shadow.winnerGlow : {},
+        color ? { borderColor: color, backgroundColor: color + '10' } : {}
+      ]}
     >
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
@@ -206,7 +227,7 @@ export function PlayerScoreCard({
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.universalPlusBtn, tokens.shadow.neonGlowPurple]}
-          onPress={onIncrement}
+          onPress={() => onIncrement(1)}
         >
           <MaterialIcons name="add" size={32} color={tokens.color.onPrimaryContainer} />
         </TouchableOpacity>
@@ -289,6 +310,20 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 100,
     marginTop: 24,
+  },
+  trucoTagsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 24,
+    width: '100%',
+    justifyContent: 'center',
+  },
+  trucoTag: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: 'rgba(26, 24, 41, 0.4)',
   },
 
   // Universal
