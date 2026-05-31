@@ -1,21 +1,24 @@
 {
   "expo": {
-    "name": "loredice",
+    "name": "LoreDice",
     "slug": "loredice",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "scheme": "loredice",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.axellion.loredice"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#12101F",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
+      "package": "com.axellion.loredice",
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -23,8 +26,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-status-bar",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "O LoreDice precisa acessar sua galeria para adicionar fotos dos jogos."
+        }
+      ],
+      "expo-font"
     ]
   }
 }

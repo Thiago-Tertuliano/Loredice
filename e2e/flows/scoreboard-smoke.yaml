@@ -1,0 +1,15 @@
+appId: com.axellion.loredice
+---
+- launchApp
+- tapOn: "Placares"
+- assertVisible: "Truco"
+- tapOn: "Truco"
+- assertVisible: "Adicionar Time A"
+- tapOn: "Adicionar Time A"
+- tapOn: "Adicionar Time B"
+- assertVisible: "Time A"
+- assertVisible: "Time B"
+- tapOn:
+    text: "+1"
+    index: 0
+- assertVisible: "1"

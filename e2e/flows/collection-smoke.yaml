@@ -1,0 +1,8 @@
+appId: com.axellion.loredice
+---
+- launchApp
+- tapOn: "Coleção"
+- assertVisible: "Coleção"
+- tapOn:
+    text: "+"
+- assertVisible: "Adicionar Jogo"
